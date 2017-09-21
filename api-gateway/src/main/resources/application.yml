@@ -1,0 +1,88 @@
+server:
+    port: 9700
+    tomcat:
+        accept-count: 800
+        max-threads: 800
+        max-connections: 1000
+        uri-encoding: UTF-8
+
+logging:
+    classpath: logback.xml
+
+# serviceId
+spring:
+    application:
+        name: api-gateway
+
+# 网关也注册为服务
+eureka:
+    instance:
+        hostname: localhost
+        instance-id: ${spring.application.name}:${server.port}
+        # 拉取服务列表时间
+        registry-fetch-interval-seconds: 5
+        # 心跳时间
+        lease-renewal-interval-in-seconds: 5
+        # 发呆时间
+        lease-expiration-duration-in-seconds: 15
+    client:
+        # 开启健康检查
+        healthcheck:
+            enabled: true
+        service-url:
+            defaultZone: http://localhost:9800/eureka/
+
+hystrix:
+    # 最大并发线程数
+    threadpool.default.coreSize: 800
+    command.default:
+        # 启用断路
+        fallback.enabled: true
+        # 短路触发时间
+        circuitBreaker.sleepWindowInMilliseconds: 1000
+        execution:
+            # 启用超时
+            timeout.enabled: true
+            isolation:
+                # 隔离策略
+                strategy: THREAD
+                # 断路超时时间
+                thread.timeoutInMilliseconds: 10000
+
+ribbon:
+    # 连接超时时间
+    ConnectTimeout: 300
+    # 请求处理超时时间
+    ReadTimeout: 1000
+    # 重试所有请求
+    OkToRetryOnAllOperations: true
+    # 当前实例重试次数
+    MaxAutoRetries: 1
+    # 切换实例重试次数
+    MaxAutoRetriesNextServer: 2
+
+zuul:
+#    ignored-services: "*"
+    # 开启ribbon重试
+    retryable: true
+    # host 重定向
+    add-host-header: true
+    # 不添加forward头信息
+    add-proxy-headers: false
+    # 敏感头信息
+    sensitive-headers: Cookie,Set-Cookie,Authorization
+    host:
+        # 最大连接数
+        max-total-connections: 800
+        # 路由最大连接数
+        max-per-route-connections: 200
+    semaphore:
+        # 最大并发请求数
+        max-semaphores: 200
+#    routes:
+#        api-order:
+#            path: /order-service/**
+#            serviceId: order-service
+#        api-user:
+#            path: /user-service/**
+#            serviceId: user-service

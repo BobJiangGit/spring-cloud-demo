@@ -1,5 +1,5 @@
 server:
-    port: 8761
+    port: 9800
 
 spring:
     application:
@@ -9,10 +9,15 @@ eureka:
     instance:
         hostname: localhost
     server:
+        # 关闭自我保护
         enable-self-preservation: false
-        eviction-interval-timer-in-ms: 10000
+        # 续期时间 服务剔除下线的间隔时间
+        eviction-interval-timer-in-ms: 15000
     client:
+        # 不注册为服务
         register-with-eureka: false
+        # 不拉取服务列表
         fetch-registry: false
+        # 注册中心地址
         service-url:
-            default-zone: http://${eureka.instance.hostname}:${server.port}/eureka/
+            defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
